@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">SQLCipherPerformance</string>
+    <string name="title_activity_main">SQLCipher Performances</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+
+    <string name="no_encryption">No Encryption</string>
+    <string name="encrypted">Encrypted</string>
+    <string name="encrypted_with_memory_security">Encrypted with Memory Security</string>
+    <string name="run_all_tests">Run Across All DB</string>
+    <string name="sqlcipher_performance_with_room">SQLCipher Performance with Room</string>
+    <string name="run_x_inserts">Inserts %s objects</string>
+    <string name="select_x_time_indexed">Select %s times indexed</string>
+    <string name="select_x_time_not_indexed">Select %s times not indexed</string>
+    <string name="cancel">Cancel</string>
+    <string name="how_many_transactions">How many transactions?</string>
+</resources>
