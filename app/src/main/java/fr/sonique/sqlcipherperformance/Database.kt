@@ -43,7 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
             memorySecure: Boolean = false
         ): AppDatabase {
             return if (secure) {
-                if(memorySecure) {
+                if(!memorySecure) {
                     personDBSecure ?: synchronized(this) {
                         personDBSecure ?: buildDatabase(context, secure, memorySecure).also { personDBSecure = it }
                     }
