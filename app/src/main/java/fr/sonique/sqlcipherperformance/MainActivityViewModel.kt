@@ -88,19 +88,19 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
                 encrypted = false
                 encryptedWithMemorySecurity = false
                 val noEncryption = runInsertRounds()
-                if ( noEncryption == RETURN_INTERRUPTED) {
+                if (noEncryption == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
                 encrypted = true
                 val encrypted = runInsertRounds()
-                if ( encrypted == RETURN_INTERRUPTED) {
+                if (encrypted == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
                 encryptedWithMemorySecurity = true
                 val encryptedWithMemorySecurity = runInsertRounds()
-                if ( encryptedWithMemorySecurity == RETURN_INTERRUPTED) {
+                if (encryptedWithMemorySecurity == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
@@ -143,21 +143,21 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
                 encryptedWithMemorySecurity = false
                 cleanStartForSelect()
                 val noEncryption = runSelectIndexed()
-                if ( noEncryption == RETURN_INTERRUPTED) {
+                if (noEncryption == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
                 encrypted = true
                 cleanStartForSelect()
                 val encrypted = runSelectIndexed()
-                if ( encrypted == RETURN_INTERRUPTED) {
+                if (encrypted == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
                 encryptedWithMemorySecurity = true
                 cleanStartForSelect()
                 val encryptedWithMemorySecurity = runSelectIndexed()
-                if ( encryptedWithMemorySecurity == RETURN_INTERRUPTED) {
+                if (encryptedWithMemorySecurity == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
@@ -194,21 +194,21 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
                 encryptedWithMemorySecurity = false
                 cleanStartForSelect()
                 val noEncryption = runSelectNotIndexed()
-                if ( noEncryption == RETURN_INTERRUPTED) {
+                if (noEncryption == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
                 encrypted = true
                 cleanStartForSelect()
                 val encrypted = runSelectNotIndexed()
-                if ( encrypted == RETURN_INTERRUPTED) {
+                if (encrypted == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
                 encryptedWithMemorySecurity = true
                 cleanStartForSelect()
                 val encryptedWithMemorySecurity = runSelectNotIndexed()
-                if ( encryptedWithMemorySecurity == RETURN_INTERRUPTED) {
+                if (encryptedWithMemorySecurity == RETURN_INTERRUPTED) {
                     return@launch
                 }
 
@@ -420,6 +420,21 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
         return time
     }
 
+    fun startRequestedFeature(featureRequested: String) {
+        when (featureRequested.toLowerCase()) {
+            Commands.INSERT,
+            Commands.INSERTS -> {
+                runAll = true
+                onInsertsClicked()
+            }
+            Commands.SELECT  -> {
+                runAll = true
+                onSelectIndexedClicked()
+            }
+            else -> Unit
+        }
+    }
+
     // Random String Generator
     private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
     private val random = Random()
@@ -436,5 +451,11 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
     override fun onCleared() {
         ioScope.cancel()
         super.onCleared()
+    }
+
+    object Commands {
+        const val INSERTS = "inserts"
+        const val INSERT = "insert"
+        const val SELECT = "select"
     }
 }

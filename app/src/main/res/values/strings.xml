@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SQLCipherPerformance</string>
+    <string name="app_name">SQL Perf</string>
     <string name="title_activity_main">SQLCipher Performances</string>
     <!--
     This string is used for square devices and overridden by hello_world in
@@ -16,4 +16,18 @@
     <string name="select_x_time_not_indexed">Select %s times not indexed</string>
     <string name="cancel">Cancel</string>
     <string name="how_many_transactions">How many transactions?</string>
+
+    <!-- Shortcuts - Insert and Select -->
+    <string name="shortcut_short_insert_label">Insert</string>
+    <string-array name="insert_set">
+        <item>Insert</item>
+        <item>Inserts</item>
+    </string-array>
+
+    <string name="shortcut_short_select_label">Select</string>
+    <string-array name="select_set">
+        <item>Select</item>
+    </string-array>
+
+
 </resources>

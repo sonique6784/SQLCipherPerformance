@@ -19,7 +19,10 @@ package fr.sonique.sqlcipherperformance
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
@@ -30,6 +33,9 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
+import com.google.firebase.appindexing.Action
+import com.google.firebase.appindexing.FirebaseUserActions
+import com.google.firebase.appindexing.builders.AssistActionBuilder
 import fr.sonique.sqlcipherperformance.databinding.ActivityMainBinding
 
 
@@ -139,6 +145,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.querySize.observe(this, {
             binding.count = it
         })
+
+        // check for deeplinks
+        intent?.handleIntent()
     }
 
     private fun setUIEnabled(enabled: Boolean) {
@@ -149,6 +158,95 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handle new intents that are coming while the activity is on foreground since we set the
+     * launchMode to be singleTask, avoiding multiple instances of this activity to be created.
+     *
+     * See [launchMode](https://developer.android.com/guide/topics/manifest/activity-element#lmode)
+     */
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.handleIntent()
+    }
+
+    /**
+     * Handles the action from the intent base on the type.
+     *
+     * @receiver the intent to handle
+     */
+    private fun Intent.handleIntent() {
+        when (action) {
+            // When the action is triggered by a deep-link, Intent.Action_VIEW will be used
+            Intent.ACTION_VIEW -> handleDeepLink(data)
+            // Otherwise start the app as you would normally do.
+            else -> Unit
+        }
+    }
+
+    /**
+     * Use the URI provided by the intent to handle the different deep-links
+     */
+    private fun handleDeepLink(data: Uri?) {
+        // path is normally used to indicate which view should be displayed
+        // i.e https://sonique.assistant.test/start?exerciseType="Running" -> path = "start"
+        var actionHandled = true
+        when (data?.path) {
+            DeepLink.OPEN -> {
+                val featureRequested = data.getQueryParameter(DeepLink.Params.FEATURE).orEmpty()
+                viewModel.startRequestedFeature(featureRequested)
+            }
+            else -> {
+                actionHandled = false
+                Log.w("MainActivity", "DeepLink, path: ${data?.path} not handled")
+                Unit
+            }
+        }
+
+        notifyActionSuccess(actionHandled)
+    }
+
+    /**
+     * Log a success or failure of the received action based on if your app could handle the action
+     *
+     * Required to help giving Assistant visibility over success or failure of an action sent to the app.
+     * Otherwise, it can’t confidently send user’s to your app for fulfillment.
+     */
+    private fun notifyActionSuccess(succeed: Boolean) {
+
+        intent.getStringExtra(DeepLink.Actions.ACTION_TOKEN_EXTRA)?.let { actionToken ->
+            val actionStatus = if (succeed) {
+                Action.Builder.STATUS_TYPE_COMPLETED
+            } else {
+                Action.Builder.STATUS_TYPE_FAILED
+            }
+            val action = AssistActionBuilder()
+                .setActionToken(actionToken)
+                .setActionStatus(actionStatus)
+                .build()
+
+            // Send the end action to the Firebase app indexing.
+            FirebaseUserActions.getInstance(getApplicationContext()).end(action)
+        }
+    }
+
+}
+
+/**
+ * Static object that defines the different deep-links
+ */
+object DeepLink {
+    const val OPEN = "/open"
+
+    /**
+     * Parameter types for the deep-links
+     */
+    object Params {
+        const val FEATURE = "feature"
+    }
+
+    object Actions {
+        const val ACTION_TOKEN_EXTRA = "actions.fulfillment.extra.ACTION_TOKEN"
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
