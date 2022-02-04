@@ -58,6 +58,7 @@ dependencies {
     // Firebase
     implementation 'com.google.firebase:firebase-core:20.0.0'
     implementation 'com.google.firebase:firebase-appindexing:20.0.0'
+    implementation 'androidx.slice:slice-builders-ktx:1.0.0-alpha6'
 
 
     def multidex_version = "2.0.1"

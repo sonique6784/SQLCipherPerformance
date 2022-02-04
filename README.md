@@ -74,6 +74,27 @@ SELECT * FROM person WHERE first_name LIKE :find
 
 ![](https://github.com/sonique6784/SQLCipherPerformance/raw/master/screenshots/SQLCipherPerformance-UI.png)
 
+
+## Google Assistant
+You can use Google Assistant to start some of the commands:
+you can say:
+ - **Insert** with SQLCipherPerformance
+ - **Select** with SQLCipherPerformance
+
+or launch the deeplink manually:
+
+```
+adb shell am start -a android.intent.action.VIEW -d "app://sqlcipherperformance.sonique.fr/open?feature=INSERT"
+```
+
+### Slices
+Give a try to Google Assistant Slices
+```
+adb shell am start -a android.intent.action.VIEW -d
+    slice-content://fr.sonique.sqlcipherperformance/slice
+```
+
+
 ## Supported by ADN
 [Android Developer News](https://play.google.com/store/apps/details?id=sonique.fr.adn) is sponsoring this app.
 

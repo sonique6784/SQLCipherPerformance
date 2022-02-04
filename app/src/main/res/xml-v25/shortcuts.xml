@@ -30,4 +30,11 @@
         </capability-binding>
     </shortcut>
 
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <slice>
+            <url-template
+                android:name="content://sqlcipherperformance.sonique.fr/open{?feature}" />
+        </slice>
+    </capability>
+
 </shortcuts>

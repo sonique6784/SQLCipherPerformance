@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity() {
      * @receiver the intent to handle
      */
     private fun Intent.handleIntent() {
+        Log.d("handleIntent", "Type Action: $action")
         when (action) {
             // When the action is triggered by a deep-link, Intent.Action_VIEW will be used
             Intent.ACTION_VIEW -> handleDeepLink(data)
@@ -189,6 +190,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleDeepLink(data: Uri?) {
         // path is normally used to indicate which view should be displayed
         // i.e https://sonique.assistant.test/start?exerciseType="Running" -> path = "start"
+        Log.d("HandleDeepLink", "Link: ${data.toString()}")
         var actionHandled = true
         when (data?.path) {
             DeepLink.OPEN -> {
@@ -236,6 +238,7 @@ class MainActivity : AppCompatActivity() {
  */
 object DeepLink {
     const val OPEN = "/open"
+    const val SLICE = "/slice"
 
     /**
      * Parameter types for the deep-links
