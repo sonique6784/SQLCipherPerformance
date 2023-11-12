@@ -47,8 +47,18 @@ class MainActivity : AppCompatActivity() {
         MainActivityViewModelFactory(this, baseContext)
     }
 
+    private var isSQLCipherLoaded = false
+    private fun loadSQLCipherLibrary() {
+        if (!isSQLCipherLoaded) {
+            System.loadLibrary("sqlcipher")
+            isSQLCipherLoaded = true
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loadSQLCipherLibrary()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 

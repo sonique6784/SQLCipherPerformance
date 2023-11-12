@@ -20,9 +20,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SQLiteDatabaseHook
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SQLiteConnection
+import net.zetetic.database.sqlcipher.SQLiteDatabase
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.nio.charset.StandardCharsets
+
+//import net.sqlcipher.database.SQLiteDatabase
+//import net.sqlcipher.database.SQLiteDatabaseHook
+//import net.sqlcipher.database.SupportFactory
 
 
 @Database(entities = [Person::class], version = 1)
@@ -32,8 +38,10 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var personDB: AppDatabase? = null
+
         @Volatile
         private var personDBSecure: AppDatabase? = null
+
         @Volatile
         private var personDBSecureWithMemorySecurity: AppDatabase? = null
 
@@ -43,13 +51,21 @@ abstract class AppDatabase : RoomDatabase() {
             memorySecure: Boolean = false
         ): AppDatabase {
             return if (secure) {
-                if(!memorySecure) {
+                if (!memorySecure) {
                     personDBSecure ?: synchronized(this) {
-                        personDBSecure ?: buildDatabase(context, secure, memorySecure).also { personDBSecure = it }
+                        personDBSecure ?: buildDatabase(
+                            context,
+                            secure,
+                            memorySecure
+                        ).also { personDBSecure = it }
                     }
                 } else {
                     personDBSecureWithMemorySecurity ?: synchronized(this) {
-                        personDBSecureWithMemorySecurity ?: buildDatabase(context, secure, memorySecure).also { personDBSecureWithMemorySecurity = it }
+                        personDBSecureWithMemorySecurity ?: buildDatabase(
+                            context,
+                            secure,
+                            memorySecure
+                        ).also { personDBSecureWithMemorySecurity = it }
                     }
                 }
             } else {
@@ -64,9 +80,9 @@ abstract class AppDatabase : RoomDatabase() {
             secure: Boolean,
             memorySecure: Boolean = false
         ): AppDatabase {
-            val dbname = if(secure && memorySecure) {
+            val dbname = if (secure && memorySecure) {
                 "encrypted-with-mem"
-            } else if(secure && !memorySecure) {
+            } else if (secure && !memorySecure) {
                 "encrypted"
             } else {
                 "not-encrypted"
@@ -77,20 +93,24 @@ abstract class AppDatabase : RoomDatabase() {
             )
             if (secure) {
                 val passphrase: ByteArray =
-                    SQLiteDatabase.getBytes("P@s5P4ras3VeryL0n9".toCharArray())
-                val factory = SupportFactory(passphrase, object : SQLiteDatabaseHook {
-                    override fun preKey(database: SQLiteDatabase?) = Unit
+                    "P@s5P4ras3VeryL0n9".encodeToByteArray()
 
-                    override fun postKey(database: SQLiteDatabase?) {
+                val factory = SupportOpenHelperFactory(passphrase, object : SQLiteDatabaseHook {
+                    override fun preKey(connection: SQLiteConnection) = Unit
+
+                    override fun postKey(connection: SQLiteConnection) {
                         if (memorySecure) {
-                            database?.rawExecSQL(
-                                "PRAGMA cipher_memory_security = ON"
+                            connection.execute(
+                                "PRAGMA cipher_memory_security = ON", null, null
                             )
                         } else {
-                            database?.rawExecSQL("PRAGMA cipher_memory_security = OFF")
+                            connection.execute(
+                                "PRAGMA cipher_memory_security = OFF", null, null
+                            )
                         }
                     }
-                })
+                }, false)
+
                 builder.openHelperFactory(factory)
             }
 
